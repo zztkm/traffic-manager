@@ -49,7 +49,7 @@ func (cb *CityBuildingSystem) New(w *ecs.World) {
 // in seconds since the last frame
 func (cb *CityBuildingSystem) Update(dt float32) {
 	if engo.Input.Button("AddCity").JustPressed() {
-		fmt.Println("The gamer pressed F1")
+		fmt.Println("The gamer pressed Enter")
 
 		city := City{BasicEntity: ecs.NewBasic()}
 

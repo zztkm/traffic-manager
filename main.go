@@ -11,6 +11,13 @@ import (
 	"github.com/zztkm/traffic-manager/systems"
 )
 
+const (
+	KeyboardScrollSpeed = 400
+	EdgeScrollSpeed     = KeyboardScrollSpeed
+	EdgeWidth           = 20
+	ZoomSpeed           = -0.125
+)
+
 type myScene struct{}
 
 // Type uniquely defines your game type
@@ -26,20 +33,25 @@ func (*myScene) Preload() {
 // and systems to your Scene.
 func (*myScene) Setup(u engo.Updater) {
 	world, _ := u.(*ecs.World)
-	engo.Input.RegisterButton("AddCity", engo.KeyEnter)
 	common.SetBackground(color.White)
+	engo.Input.RegisterButton("AddCity", engo.KeyF1)
 
 	world.AddSystem(&common.RenderSystem{})
 	world.AddSystem(&common.MouseSystem{})
+
+	world.AddSystem(common.NewKeyboardScroller(400, engo.DefaultHorizontalAxis, engo.DefaultVerticalAxis))
+	world.AddSystem(&common.EdgeScroller{EdgeScrollSpeed, EdgeWidth})
+	world.AddSystem(&common.MouseZoomer{ZoomSpeed})
 
 	world.AddSystem(&systems.CityBuildingSystem{})
 }
 
 func main() {
 	opts := engo.RunOptions{
-		Title:  "Hello World",
-		Width:  400,
-		Height: 400,
+		Title:          "Hello World",
+		Width:          400,
+		Height:         400,
+		StandardInputs: true,
 	}
 	engo.Run(opts, &myScene{})
 }
