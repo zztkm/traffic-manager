@@ -1,4 +1,4 @@
-module github.com/zztkm/aom
+module github.com/zztkm/traffic-manager
 
 go 1.14
 
