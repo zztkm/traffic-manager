@@ -39,7 +39,7 @@ func (*myScene) Type() string { return "myGame" }
 // Preload is called before loading any assets from the disk,
 // to allow you to register / queue them
 func (*myScene) Preload() {
-	engo.Files.Load("textures/city.png", "tilemap/TrafficMap.tmx")
+	engo.Files.Load("textures/citySheet.png", "tilemap/TrafficMap.tmx")
 }
 
 // Setup is called before the main loop starts. It allows you to add entities
@@ -47,14 +47,13 @@ func (*myScene) Preload() {
 func (*myScene) Setup(u engo.Updater) {
 	world, _ := u.(*ecs.World)
 	common.SetBackground(color.White)
-	engo.Input.RegisterButton("AddCity", engo.KeyF1)
 
 	world.AddSystem(&common.RenderSystem{})
 	world.AddSystem(&common.MouseSystem{})
 
 	kbs := common.NewKeyboardScroller(KeyboardScrollSpeed, engo.DefaultHorizontalAxis, engo.DefaultVerticalAxis)
 	world.AddSystem(kbs)
-	world.AddSystem(&common.EdgeScroller{EdgeScrollSpeed, EdgeWidth})
+	// world.AddSystem(&common.EdgeScroller{EdgeScrollSpeed, EdgeWidth})
 	world.AddSystem(&common.MouseZoomer{ZoomSpeed})
 
 	world.AddSystem(&systems.CityBuildingSystem{})
@@ -126,9 +125,9 @@ func (*myScene) Setup(u engo.Updater) {
 
 func main() {
 	opts := engo.RunOptions{
-		Title:          "Hello World",
-		Width:          400,
-		Height:         400,
+		Title:          "集まれ ORE no MORI",
+		Width:          800,
+		Height:         800,
 		StandardInputs: true,
 	}
 	engo.Run(opts, &myScene{})
