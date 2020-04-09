@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"image"
 	"image/color"
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
+	"golang.org/x/image/font/gofont/gosmallcaps"
 
 	// EDIT THE FOLLOWING IMPORT TO YOUR systems package
 	"github.com/zztkm/traffic-manager/systems"
@@ -40,6 +42,7 @@ func (*myScene) Type() string { return "myGame" }
 // to allow you to register / queue them
 func (*myScene) Preload() {
 	engo.Files.Load("textures/citySheet.png", "tilemap/TrafficMap.tmx")
+	engo.Files.LoadReaderData("go.ttf", bytes.NewReader(gosmallcaps.TTF))
 }
 
 // Setup is called before the main loop starts. It allows you to add entities
@@ -53,10 +56,12 @@ func (*myScene) Setup(u engo.Updater) {
 
 	kbs := common.NewKeyboardScroller(KeyboardScrollSpeed, engo.DefaultHorizontalAxis, engo.DefaultVerticalAxis)
 	world.AddSystem(kbs)
-	// world.AddSystem(&common.EdgeScroller{EdgeScrollSpeed, EdgeWidth})
+	world.AddSystem(&common.EdgeScroller{EdgeScrollSpeed, EdgeWidth})
 	world.AddSystem(&common.MouseZoomer{ZoomSpeed})
 
 	world.AddSystem(&systems.CityBuildingSystem{})
+	world.AddSystem(&systems.HUDTextSystem{})
+	world.AddSystem(&systems.MoneySystem{})
 
 	hud := HUD{BasicEntity: ecs.NewBasic()}
 	hud.SpaceComponent = common.SpaceComponent{
@@ -76,7 +81,7 @@ func (*myScene) Setup(u engo.Updater) {
 		Scale:    engo.Point{1, 1},
 	}
 	hud.RenderComponent.SetShader(common.HUDShader)
-	hud.RenderComponent.SetZIndex(1)
+	hud.RenderComponent.SetZIndex(1000)
 
 	for _, system := range world.Systems() {
 		switch sys := system.(type) {

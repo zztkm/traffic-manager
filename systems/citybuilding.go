@@ -1,7 +1,6 @@
 package systems
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -66,21 +65,16 @@ var cities = [...][12]int{
 	},
 }
 
-type MouseTracker struct {
-	ecs.BasicEntity
-	common.MouseComponent
-}
-
+// City is a city tile
 type City struct {
 	ecs.BasicEntity
 	common.RenderComponent
 	common.SpaceComponent
 }
 
+// CityBuildingSystem builds random cities as the game progresses
 type CityBuildingSystem struct {
 	world *ecs.World
-
-	mouseTracker MouseTracker
 
 	usedTiles []int
 
@@ -91,17 +85,6 @@ type CityBuildingSystem struct {
 // New is the initialisation of the System
 func (cb *CityBuildingSystem) New(w *ecs.World) {
 	cb.world = w
-	fmt.Println("CityBuildingSystem was added to the Scene")
-
-	cb.mouseTracker.BasicEntity = ecs.NewBasic()
-	cb.mouseTracker.MouseComponent = common.MouseComponent{Track: true}
-
-	for _, system := range w.Systems() {
-		switch sys := system.(type) {
-		case *common.MouseSystem:
-			sys.Add(&cb.mouseTracker.BasicEntity, &cb.mouseTracker.MouseComponent, nil, nil)
-		}
-	}
 
 	Spritesheet = common.NewSpritesheetWithBorderFromFile("textures/citySheet.png", 16, 16, 1, 1)
 
@@ -164,6 +147,24 @@ func (cb *CityBuildingSystem) generateCity() {
 			}
 		}
 	}
+
+	engo.Mailbox.Dispatch(HUDTextMessage{
+		BasicEntity: ecs.NewBasic(),
+		SpaceComponent: common.SpaceComponent{
+			Position: engo.Point{X: float32((x + 1) * 64), Y: float32((y + 1) * 64)},
+			Width:    64,
+			Height:   64,
+		},
+		MouseComponent: common.MouseComponent{},
+		Line1:          "Town",
+		Line2:          "Just built!",
+		Line3:          "A town generates",
+		Line4:          "$100 per day.",
+	})
+
+	engo.Mailbox.Dispatch(CityUpdateMessage{
+		New: CityTypeNew,
+	})
 }
 
 func (cb *CityBuildingSystem) isTileUsed(tile int) bool {
